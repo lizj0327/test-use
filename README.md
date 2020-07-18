@@ -6,7 +6,8 @@
 1、引入这个jar  
 2、在application.properties中配置test.init.classes属性，添加一个或者多个类，以，隔开例如test.init.classes=com.aa,com.bb
 使用方法：
-### <dependency>  
+### 
+<dependency>  
     <groupId>com.example</groupId>  
     <artifactId>test-use-spring-boot-starter</artifactId>  
     <version>0.0.1-SNAPSHOT</version>  
