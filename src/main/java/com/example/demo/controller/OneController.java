@@ -21,7 +21,7 @@ public class OneController {
     ApplicationContext ApplicationContext;
 
     @Autowired
-    Dgfd Dgfd;
+    Dgfd dgfd;
     @Autowired
     Test1 test1;
     @Autowired
@@ -41,7 +41,7 @@ public class OneController {
         System.out.println(myBeanPostProcessor);
 //        System.out.println(AutowiredAnnotationBeanPostProcessor);
         System.out.println(ApplicationContext);
-        System.out.println(Dgfd);
+        System.out.println(dgfd);
         System.out.println(test1);
         System.out.println(test2);
         System.out.println(test3);

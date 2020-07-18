@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-@Component
 public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware, InitializingBean {
 
     DefaultListableBeanFactory defaultListableBeanFactory;
