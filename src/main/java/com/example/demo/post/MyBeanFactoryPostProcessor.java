@@ -94,6 +94,9 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
 
     private void setNewBean(AutowiredFieldElement element){
         boolean bean = applicationContext.containsBeanDefinition(element.getName());
+        if(element.getClazz().isInterface()){
+            return;
+        }
         if(!bean){
             BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(element.getClazz());
             defaultListableBeanFactory.registerBeanDefinition(element.getName(), beanDefinitionBuilder.getRawBeanDefinition());
@@ -186,10 +189,10 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
             this.clazz = field.getType();
             String name = field.getType().getSimpleName();
             Qualifier annotation = field.getAnnotation(Qualifier.class);
-            if(annotation!=null){
+            if(annotation!=null && !StringUtils.isEmpty(annotation.value())){
                 name = annotation.value();
             }
-            this.name = name;
+            this.name = firstLower(name);
         }
         public AutowiredFieldElement(Class clazz, boolean required) {
             this.required = required;
@@ -203,7 +206,7 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
             if(annotation1!=null && !StringUtils.isEmpty(annotation1.value())){
                 name = annotation1.value();
             }
-            this.name = name;
+            this.name = firstLower(name);
         }
 
         public Field getField(){
@@ -216,6 +219,9 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
 
         public Class getClazz(){
             return clazz;
+        }
+        private String firstLower(String name){
+            return name.substring(0,1).toLowerCase()+name.substring(1);
         }
 
     }
