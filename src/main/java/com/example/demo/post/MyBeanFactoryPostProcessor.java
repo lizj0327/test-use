@@ -36,7 +36,8 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet(4);
 
     private List<Class> initElements = new ArrayList<>();
-
+    List<Class> added = new ArrayList<>();
+    Stack<Class> loop = new Stack<>();
 
 
     public MyBeanFactoryPostProcessor() {
@@ -78,19 +79,39 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
             setNewBean(clazz1);
         }
     }
-
+    
     private void getChildren(Class clazz,List<AutowiredFieldElement> clazzs){
-        List<AutowiredFieldElement> metadata = findAutowiringMetadata(clazz.getSimpleName(), clazz);
-        for(AutowiredFieldElement m:metadata){
-            Field field = m.getField();
-            Class clazz1 = field.getType();
-            boolean bean = applicationContext.containsBeanDefinition(m.getName());
-            if(!bean){
-                clazzs.add(m);
+        loop.add(clazz);
+        while(!loop.isEmpty()){
+            clazz = loop.pop();
+            List<AutowiredFieldElement> metadata = findAutowiringMetadata(clazz.getSimpleName(), clazz);
+            if(metadata!=null){
+               for(AutowiredFieldElement m:metadata){
+                    Field field = m.getField();
+                    Class clazz1 = field.getType();
+                    boolean bean = applicationContext.containsBeanDefinition(m.getName());
+                    if(!bean){
+                        clazzs.add(m);
+                    }
+                    loop.add(clazz1);
+                } 
             }
-            getChildren(clazz1,clazzs);
         }
+        
     }
+
+//     private void getChildren(Class clazz,List<AutowiredFieldElement> clazzs){
+//         List<AutowiredFieldElement> metadata = findAutowiringMetadata(clazz.getSimpleName(), clazz);
+//         for(AutowiredFieldElement m:metadata){
+//             Field field = m.getField();
+//             Class clazz1 = field.getType();
+//             boolean bean = applicationContext.containsBeanDefinition(m.getName());
+//             if(!bean){
+//                 clazzs.add(m);
+//             }
+//             getChildren(clazz1,clazzs);
+//         }
+//     }
 
     private void setNewBean(AutowiredFieldElement element){
         boolean bean = applicationContext.containsBeanDefinition(element.getName());
@@ -116,6 +137,10 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
     }
 
     private List<AutowiredFieldElement> buildAutowiringMetadata(Class<?> clazz) {
+        if(added.contains(clazz)){
+            return new ArrayList<>();
+        }
+        added.add(clazz);
         if (!AnnotationUtils.isCandidateClass(clazz, this.autowiredAnnotationTypes)) {
             return null;
         } else {
