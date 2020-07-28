@@ -21,6 +21,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -35,14 +36,15 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
 
     private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet(4);
 
-    private List<Class> initElements = new ArrayList<>();
-    List<Class> added = new ArrayList<>();
-    Stack<Class> loop = new Stack<>();
+    private List<Class> initElements = new ArrayList<>(); //存放需要初始化入口的类
+    List<Class> added = new ArrayList<>();//去重用的
+    Stack<Class> loop = new Stack<>();//临时保存需要加入的类，循环使用
 
 
     public MyBeanFactoryPostProcessor() {
         this.autowiredAnnotationTypes.add(Autowired.class);
-        this.autowiredAnnotationTypes.add(Value.class);
+//        this.autowiredAnnotationTypes.add(Value.class);
+        this.autowiredAnnotationTypes.add(Resource.class);
 //
 //        try {
 //            this.autowiredAnnotationTypes.add(ClassUtils.forName("javax.inject.Inject", MyBeanFactoryPostProcessor.class.getClassLoader()));
@@ -100,6 +102,7 @@ public class MyBeanFactoryPostProcessor extends AutowiredAnnotationBeanPostProce
         
     }
 
+    // 递归容易出现超过栈深度的错误
 //     private void getChildren(Class clazz,List<AutowiredFieldElement> clazzs){
 //         List<AutowiredFieldElement> metadata = findAutowiringMetadata(clazz.getSimpleName(), clazz);
 //         for(AutowiredFieldElement m:metadata){
